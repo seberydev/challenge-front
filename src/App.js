@@ -1,6 +1,9 @@
 import React, { useRef, useState, useEffect } from "react";
 import Moveable from "react-moveable";
 
+const canvasWidth = 620;
+const canvasHeight = 440;
+
 const App = () => {
   const [moveableComponents, setMoveableComponents] = useState([]);
   const [selected, setSelected] = useState(null);
@@ -19,7 +22,6 @@ const App = () => {
 
   const removeMoveable = () => {
     const filtered = moveableComponents.filter((obj) => obj.id !== selected);
-    console.log(filtered);
     setMoveableComponents(filtered);
   };
 
@@ -47,21 +49,11 @@ const App = () => {
   };
 
   const updateMoveable = (id, newComponent, updateEnd = false) => {
-    if (newComponent.left > 714) {
-      newComponent.left = 713;
-    }
+    if (newComponent.left >= canvasWidth) newComponent.left = canvasWidth - 1;
+    if (newComponent.left <= 0) newComponent.left = 1;
 
-    if (newComponent.left < 0) {
-      newComponent.left = 0;
-    }
-
-    if (newComponent.top < 0) {
-      newComponent.top = 0;
-    }
-
-    if (newComponent.top > 558) {
-      newComponent.top = 557;
-    }
+    if (newComponent.top >= canvasHeight) newComponent.top = canvasHeight - 1;
+    if (newComponent.top <= 0) newComponent.top = 1;
 
     const updatedMoveables = moveableComponents.map((moveable, i) => {
       if (moveable.id === id) {
@@ -95,10 +87,12 @@ const App = () => {
 
   return (
     <main style={{ height: "100vh", width: "100vw" }}>
-      <button onClick={addMoveable}>Add Moveable</button>
-      <button onClick={removeMoveable} style={{ marginLeft: "20px" }}>
-        Remove Moveable
-      </button>
+      <div>
+        <button onClick={addMoveable}>Add Moveable</button>
+        <button onClick={removeMoveable} style={{ marginLeft: "20px" }}>
+          Remove Moveable
+        </button>
+      </div>
       <div
         id="parent"
         style={{
@@ -126,6 +120,7 @@ const App = () => {
 export default App;
 
 const Component = ({
+  handleResizeStart,
   updateMoveable,
   top,
   left,
@@ -218,19 +213,6 @@ const Component = ({
 
     const absoluteTop = top + beforeTranslate[1];
     const absoluteLeft = left + beforeTranslate[0];
-
-    // updateMoveable(
-    //   id,
-    //   {
-    //     top: absoluteTop,
-    //     left: absoluteLeft,
-    //     width: newWidth,
-    //     height: newHeight,
-    //     color,
-    //     url,
-    //   },
-    //   true
-    // );
   };
 
   return (
@@ -245,9 +227,9 @@ const Component = ({
           left: left,
           width: width,
           height: height,
-          // background: color,
           backgroundImage: `url("${url}")`,
           backgroundSize: size,
+          backgroundPosition: "center",
         }}
         onClick={() => setSelected(id)}
       />
